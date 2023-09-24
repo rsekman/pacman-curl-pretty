@@ -1,0 +1,50 @@
+#!/usr/bin/sh
+
+find_awk_script() {
+    local dirs=($(pwd) /usr/lib/pacman-curl-pretty/ /var/lib/pacman-curl-pretty/)
+    local fname=pacman-curl-pretty.awk
+    declare -a paths
+    readarray -t paths < <(
+        find ${dirs[*]} -maxdepth 1 -type f \
+            -name "${fname}" \
+            2>/dev/null
+    )
+    if [ ${#paths[*]} -eq 0 ]; then
+        >&2 echo "Could not locate ${fname} in any of the these directories: ${dirs[*]}"
+        return 1
+    else
+        echo ${paths[0]}
+        return 0
+    fi
+}
+
+pretty () {
+    declare -i lines=0;
+    local cl=$(tput el)
+    local cols=$(tput cols)
+    local hs=$(printf "%${cols}s" | sed -e 's/ /#/g')
+    local ds=$(printf "%${cols}s" | sed -e 's/ /-/g')
+
+    while read l; do
+        if [ $lines -gt 2 ]; then
+            echo -en "\r$cl"
+            awk -f $awk_path \
+                -v fname=$1 \
+                -v cols=$cols \
+                -v hs=$hs \
+                -v ds=$ds \
+                <<< $l;
+        fi
+        lines=$(($lines+1))
+    done
+}
+
+awk_path=$(find_awk_script)
+if [ $? -ne 0 ]; then
+    exit 1
+fi
+
+curl ${@:3} -o $1 $2 2>&1 | \
+    stdbuf -oL tr '\r' '\n' | \
+    pretty $1
+    # awk "{printf \"\r\" \$2 \"$cl\"}"
