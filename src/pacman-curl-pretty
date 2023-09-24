@@ -24,12 +24,16 @@ pretty () {
     local cols=$(tput cols)
     local hs=$(printf "%${cols}s" | sed -e 's/ /#/g')
     local ds=$(printf "%${cols}s" | sed -e 's/ /-/g')
+    local fname=$1;
+    for s in .part .zst .tar .pkg; do
+        fname=$(basename $fname $s)
+    done
 
     while read l; do
         if [ $lines -gt 2 ]; then
             echo -en "\r$cl"
             awk -f $awk_path \
-                -v fname=$1 \
+                -v fname=$fname \
                 -v cols=$cols \
                 -v hs=$hs \
                 -v ds=$ds \
@@ -37,6 +41,7 @@ pretty () {
         fi
         lines=$(($lines+1))
     done
+    echo ""
 }
 
 awk_path=$(find_awk_script)
