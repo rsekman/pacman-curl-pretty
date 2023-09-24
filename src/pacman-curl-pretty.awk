@@ -18,7 +18,7 @@ function fix_unit(s)
     }
 BEGIN {
     cols = strtonum(cols);
-    infolen = cols * 6/10;
+    infolen = int(cols * 6/10);
     proglen = cols - infolen;
 }
 {
