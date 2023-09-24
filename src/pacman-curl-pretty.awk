@@ -1,14 +1,22 @@
 function fix_unit(s)
     {
-        match(s, /([0-9]+(\.[0-9])?)([kMGT]?)/, m);
-        if ( length(m[3]) != 0 )
-            m[3] = m[3] "iB";
+        units="kMGT";
+        match(s, /(([0-9]+)(\.[0-9])?)([kMGT]?)/, m);
+        unit = m[4];
+        value = m[1];
+        if ( length(m[2]) > 3)
+            value = value/1000;
+            if ( length(unit) != 0 )
+                unit = "k";
+            else
+                unit = substr(units, index(units, unit), 1)
+        if ( length(unit) != 0 )
+            unit = unit "iB";
         else
-            m[3] = "B"
-        return sprintf("%6.1f %3s", m[1], m[3]);
+            unit = "B"
+        return sprintf("%5.1f %3s", value, unit);
     }
 BEGIN {
-    ORS = "";
     cols = strtonum(cols);
     infolen = cols * 6/10;
     proglen = cols - infolen;

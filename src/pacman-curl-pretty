@@ -33,6 +33,7 @@ pretty () {
         if [ $lines -gt 2 ]; then
             echo -en "\r$cl"
             awk -f $awk_path \
+                -v ORS='' \
                 -v fname=$fname \
                 -v cols=$cols \
                 -v hs=$hs \
@@ -41,7 +42,7 @@ pretty () {
         fi
         lines=$(($lines+1))
     done
-    echo ""
+    echo
 }
 
 awk_path=$(find_awk_script)
