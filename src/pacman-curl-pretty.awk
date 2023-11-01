@@ -1,15 +1,17 @@
 function fix_unit(s)
     {
-        units="kMGT";
+        units="kMGTP";
         match(s, /(([0-9]+)(\.[0-9])?)([kMGT]?)/, m);
         unit = m[4];
         value = m[1];
-        if ( length(m[2]) > 3)
-            value = value/1000;
-            if ( length(unit) != 0 )
-                unit = "k";
+        if ( length(m[2]) > 3) {
+            value = strtonum(m[1])/1024;
+            if (length(unit) != 0 )
+                # index(str, "") = 0, so this will not work for kiB
+                unit = substr(units, 1+index(units, unit), 1);
             else
-                unit = substr(units, index(units, unit), 1)
+                unit = "k"
+        }
         if ( length(unit) != 0 )
             unit = unit "iB";
         else
